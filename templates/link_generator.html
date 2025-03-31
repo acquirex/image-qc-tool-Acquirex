@@ -49,6 +49,8 @@
       line-height: 1.6;
     }
 
+
+
     /* Animated background elements */
     .bg-circle {
       position: absolute;
@@ -514,6 +516,13 @@
         padding: 0.8rem 1.5rem;
       }
     }
+    #rightSection {
+  display: none; /* Hide by default */
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+
   </style>
 </head>
 <body>
@@ -563,7 +572,7 @@
     </div>
 
     <!-- Right section (60%) -->
-    <div class="right-section">
+    <div class="right-section" id="rightSection" >
       <div class="progress-download-container">
         <div id="loaderOverlay">
           <div class="spinner"></div>
@@ -593,18 +602,19 @@
     const downloadBtn = document.getElementById('downloadBtn');
     const uploadForm = document.getElementById('uploadForm');
     const progressBar = document.getElementById('progressBar');
-
+    const rightSection = document.getElementById('rightSection');
+  
     // Click to select file
     uploadBox.addEventListener('click', () => fileInput.click());
-
+  
     // Drag and drop functionality
     uploadBox.addEventListener('dragover', (e) => {
       e.preventDefault();
       uploadBox.classList.add('active');
     });
-
+  
     uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('active'));
-
+  
     uploadBox.addEventListener('drop', (e) => {
       e.preventDefault();
       uploadBox.classList.remove('active');
@@ -613,10 +623,10 @@
         updateFileInfo();
       }
     });
-
+  
     // File selection handler
     fileInput.addEventListener('change', updateFileInfo);
-
+  
     function updateFileInfo() {
       if (fileInput.files.length > 0) {
         fileName.textContent = fileInput.files[0].name;
@@ -627,70 +637,73 @@
         submitBtn.disabled = true;
       }
     }
-
-    // Form submission with enhanced loading state
-    uploadForm.addEventListener('submit', async function(e) {
+  
+    // ✅ FORM SUBMIT HANDLER FIXED
+    uploadForm.addEventListener('submit', async function (e) {
       e.preventDefault();
-      
-      // Validate file was selected
+      rightSection.style.display = 'flex'; // or 'block' depending on your layout
+  setTimeout(() => {
+    rightSection.style.opacity = '1';
+  }, 10);
+
+setTimeout(() => {
+  rightSection.style.opacity = '1';
+  rightSection.style.pointerEvents = 'auto';
+  rightSection.style.transform = 'translateY(0)';
+}, 50);
+
+  
       if (!fileInput.files.length) {
         alert('Please select a ZIP file first');
         return;
       }
-
-      // Reset UI state
+  
       loaderOverlay.style.display = 'flex';
       submitBtn.disabled = true;
       progressBar.style.width = '0%';
       downloadBtn.style.display = 'none';
-
+  
       const formData = new FormData();
       formData.append('zip_file', fileInput.files[0]);
-
+  
+      let progressInterval;
+  
       try {
-        // Create progress interval
-        let progressInterval = setInterval(() => {
+        progressInterval = setInterval(() => {
           const currentWidth = parseInt(progressBar.style.width) || 0;
           const newWidth = Math.min(currentWidth + 10, 90);
           progressBar.style.width = newWidth + '%';
         }, 500);
-
-        // Make the actual request
+  
         const res = await fetch('/generate-links', {
           method: 'POST',
           body: formData
         });
-
-        // Clear progress interval
+  
         clearInterval(progressInterval);
-        
-        // Handle response
+  
         if (!res.ok) {
           throw new Error(`Server error: ${res.status}`);
         }
-
+  
         const data = await res.json();
-        
-        // Validate response
+  
         if (!data.excel_url) {
           throw new Error('Invalid response from server');
         }
-
-        // Update UI
+  
         progressBar.style.width = '100%';
         loaderOverlay.style.display = 'none';
         downloadBtn.href = data.excel_url;
         downloadBtn.style.display = 'flex';
+  
         const processingTime = data.processing_time;
-fileInfo.innerHTML += `
-  <p><i class="fas fa-stopwatch"></i> Processed in: <strong>${processingTime} seconds</strong></p>
-`;
-
-        
+        fileInfo.innerHTML += `
+          <p><i class="fas fa-stopwatch"></i> Processed in: <strong>${processingTime} seconds</strong></p>
+        `;
+  
       } catch (err) {
         console.error('Error:', err);
-        
-        // Reset UI
         clearInterval(progressInterval);
         loaderOverlay.innerHTML = `
           <div class="status-message error">
@@ -703,5 +716,6 @@ fileInfo.innerHTML += `
       }
     });
   </script>
+  
 </body>
 </html>
