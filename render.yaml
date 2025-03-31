@@ -1,7 +1,8 @@
 services:
   - type: web
-    name: amazon-qc-tool
+    name: image-qc-tool
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: python app.py
-    autoDeploy: true
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python app.py"
+    branch: main
