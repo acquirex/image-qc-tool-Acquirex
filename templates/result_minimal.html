@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Excel Ready! | AcquireX</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #3a86ff;
+      --dark: #121212;
+      --darker: #0a0a0a;
+      --light: #ffffff;
+      --gray: #6c757d;
+      --success: #00ff99;
+      --success-light: #66ffc2;
+      --border-color: #444;
+      --glow: 0 0 15px rgba(67, 97, 238, 0.5);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--darker), var(--dark));
+      color: var(--light);
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 50px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background elements */
+    .bg-circle {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.15;
+      z-index: -1;
+    }
+    
+    .circle-1 {
+      width: 300px;
+      height: 300px;
+      background: var(--primary);
+      top: -100px;
+      left: -100px;
+      animation: float 12s ease-in-out infinite;
+    }
+    
+    .circle-2 {
+      width: 400px;
+      height: 400px;
+      background: var(--success);
+      bottom: -150px;
+      right: -100px;
+      animation: float 15s ease-in-out infinite reverse;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(30px, 30px); }
+    }
+
+    /* Header styles */
+    .logo-container {
+      position: absolute;
+      top: 20px;
+      left: 40px;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    .logo-container:hover {
+      transform: scale(1.05);
+    }
+
+    .logo-container img {
+      height: 60px;
+      width: auto;
+    }
+
+    .header-line {
+      position: absolute;
+      top: 90px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+      z-index: 999;
+    }
+
+    /* Main content */
+    .content-box {
+      background: rgba(30, 30, 30, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      background: linear-gradient(90deg, var(--primary), var(--success));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 2px 10px rgba(0, 255, 153, 0.2);
+    }
+
+    /* Download button */
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      margin-top: 25px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(67, 97, 238, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .download-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 25px rgba(67, 97, 238, 0.6);
+    }
+
+    .download-btn:hover::before {
+      left: 100%;
+    }
+
+    .download-btn i {
+      font-size: 1.2rem;
+    }
+
+    /* Loading animation */
+    .loading-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+      width: 100%;
+    }
+
+    .spinner-container {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin-bottom: 25px;
+    }
+
+    .spinner {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 5px solid transparent;
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      border-bottom-color: var(--success);
+      animation: spin 1.5s linear infinite;
+      filter: drop-shadow(0 0 8px rgba(67, 97, 238, 0.5));
+    }
+
+    .spinner-inner {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      right: 15px;
+      bottom: 15px;
+      border: 3px solid transparent;
+      border-radius: 50%;
+      border-left-color: var(--primary-light);
+      border-right-color: var(--success-light);
+      animation: spinReverse 2s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes spinReverse {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(-720deg); }
+    }
+
+    .progress-text {
+      color: var(--light);
+      font-size: 1.1rem;
+      margin: 15px 0;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .progress-bar {
+      width: 100%;
+      max-width: 400px;
+      height: 10px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      margin-top: 20px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--success));
+      transition: width 0.5s ease;
+      position: relative;
+    }
+
+    .progress-bar-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.4), 
+                transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .content-ready {
+      display: none;
+      text-align: center;
+    }
+
+    .success-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      color: var(--success);
+      text-shadow: 0 0 15px rgba(0, 255, 153, 0.5);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      body {
+        padding: 30px 20px;
+        padding-top: 130px;
+      }
+      
+      .logo-container {
+        left: 20px;
+        top: 15px;
+      }
+      
+      .logo-container img {
+        height: 50px;
+      }
+      
+      .header-line {
+        top: 80px;
+      }
+      
+      .content-box {
+        padding: 30px 20px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .circle-1, .circle-2 {
+        display: none;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+  <!-- Animated background elements -->
+  <div class="bg-circle circle-1"></div>
+  <div class="bg-circle circle-2"></div>
+
+  <!-- Header -->
+  <div class="logo-container">
+    <img src="/static/Acquirex-logo---Reversed-White.png" alt="Acquirex Logo">
+  </div>
+  <div class="header-line"></div>
+
+  <!-- Main content -->
+  <div class="content-box">
+    <!-- Loading state -->
+    <div class="loading-container" id="loadingContainer">
+      <div class="spinner-container">
+        <div class="spinner"></div>
+        <div class="spinner-inner"></div>
+      </div>
+      <p class="progress-text" id="progressText">Initializing Excel generation...</p>
+      <div class="progress-bar">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Content ready state -->
+    <div class="content-ready" id="contentReady">
+      <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h1 class="animate__animated animate__fadeIn">Your Excel file is ready!</h1>
+      <a class="download-btn animate__animated animate__fadeInUp" href="{{ url_for('static', filename='exports/' + excel_filename) }}" download>
+        <i class="fas fa-file-excel"></i> Download Excel
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Show loading state immediately with enhanced progress simulation
+    document.addEventListener('DOMContentLoaded', function() {
+      const loadingContainer = document.getElementById('loadingContainer');
+      const contentReady = document.getElementById('contentReady');
+      const progressBar = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+      
+      // Show loading state with animation
+      loadingContainer.style.display = 'flex';
+      loadingContainer.classList.add('animate__animated', 'animate__fadeIn');
+      
+      // Progress messages
+      const messages = [
+        "Initializing Excel generation...",
+        "Processing image data...",
+        "Compiling links...",
+        "Finalizing spreadsheet...",
+        "Almost done..."
+      ];
+      
+      // Simulate progress with messages
+      let progress = 0;
+      let messageIndex = 0;
+      
+      const interval = setInterval(() => {
+        // Update progress
+        progress += Math.floor(Math.random() * 8) + 3;
+        if (progress > 100) progress = 100;
+        progressBar.style.width = progress + '%';
+        
+        // Update message every 20% progress
+        if (progress >= (messageIndex + 1) * 20 && messageIndex < messages.length - 1) {
+          messageIndex++;
+          progressText.textContent = messages[messageIndex];
+          progressText.classList.add('animate__animated', 'animate__fadeIn');
+          setTimeout(() => {
+            progressText.classList.remove('animate__animated', 'animate__fadeIn');
+          }, 500);
+        }
+        
+        // When complete
+        if (progress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            loadingContainer.classList.add('animate__animated', 'animate__fadeOut');
+            setTimeout(() => {
+              loadingContainer.style.display = 'none';
+              contentReady.style.display = 'block';
+            }, 500);
+          }, 800);
+        }
+      }, 500);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Image Quality Check Tool</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --primary: #3B82F6;
+      --primary-light: #EFF6FF;
+      --success: #10B981;
+      --success-light: #ECFDF5;
+      --error: #EF4444;
+      --error-light: #FEF2F2;
+      --light-bg: #F9FAFB;
+      --card-bg: #FFFFFF;
+      --border: #E5E7EB;
+      --text: #111827;
+      --text-light: #6B7280;
+      --warning: #F59E0B;
+      --warning-light: #FEF3C7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--light-bg);
+      color: var(--text);
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      color: var(--text-light);
+      font-size: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: flex-start;
+    }
+
+    .change-btn-wrapper {
+      display: none;
+      margin-top: 0.5rem;
+    }
+
+    .reset-btn {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      color: #6B7280;
+      transition: all 0.2s;
+    }
+
+    .reset-btn:hover {
+      background: var(--light-bg);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .panel {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .left-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 970px;
+    }
+
+    .upload-area {
+      width: 100%;
+      height: 600px;
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      background: var(--light-bg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .upload-icon {
+      width: 48px;
+      height: 48px;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .upload-text strong {
+      font-size: 1.1rem;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    .upload-text span {
+      color: var(--text-light);
+      font-size: 0.95rem;
+    }
+
+    #file-upload {
+      display: none;
+    }
+
+    .preview-image {
+      width: 100%;
+      height: 600px;
+      border-radius: 12px;
+      background: var(--light-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .preview-image img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 0%;
+    }
+
+    .result-card {
+      flex: 1;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      min-width: 400px;
+    }
+
+    .results-header {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .results-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      background: var(--light-bg);
+      font-size: 0.95rem;
+      align-items: center;
+    }
+
+    .result-value {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .result-value.pass {
+      color: var(--success);
+    }
+
+    .result-value.fail {
+      color: var(--error);
+    }
+
+    .result-value.warning {
+      color: var(--warning);
+    }
+
+    .summary {
+      padding: 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      text-align: center;
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .summary.pass {
+      background: var(--success-light);
+      color: var(--success);
+      border: 1px solid #bbf7d0;
+    }
+
+    .summary.fail {
+      background: var(--error-light);
+      color: var(--error);
+      border: 1px solid #fecaca;
+    }
+
+    .summary.warning {
+      background: var(--warning-light);
+      color: var(--warning);
+      border: 1px solid #fde68a;
+    }
+
+    .empty-state {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-light);
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    /* New styles */
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      margin-top: 1rem;
+      overflow: hidden;
+      display: none;
+    }
+
+    .progress {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .status-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .pass-icon {
+      background: var(--success-light);
+      color: var(--success);
+    }
+
+    .fail-icon {
+      background: var(--error-light);
+      color: var(--error);
+    }
+
+    .warning-icon {
+      background: var(--warning-light);
+      color: var(--warning);
+    }
+
+    .quality-score {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+
+    .requirements-list {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .requirement-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .requirement-item:last-child {
+      border-bottom: none;
+    }
+
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+    }
+
+    .tooltip-icon {
+      color: var(--text-light);
+      font-size: 14px;
+    }
+
+    .tooltip-text {
+      visibility: hidden;
+      width: 200px;
+      background-color: var(--text);
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.85rem;
+      font-weight: normal;
+    }
+
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .drag-over {
+      border-color: var(--primary);
+      background-color: rgba(59, 130, 246, 0.05);
+    }
+
+    .file-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 1rem;
+    }
+
+    .file-name {
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-meta {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+
+    .score-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .score-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .pass-circle {
+      background: var(--success-light);
+      color: var(--success);
+      border: 3px solid var(--success);
+    }
+
+    .fail-circle {
+      background: var(--error-light);
+      color: var(--error);
+      border: 3px solid var(--error);
+    }
+
+    .warning-circle {
+      background: var(--warning-light);
+      color: var(--warning);
+      border: 3px solid var(--warning);
+    }
+
+    .score-details {
+      flex-grow: 1;
+    }
+
+    .score-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .score-description {
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+
+    .check-details {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    /* Description section styles */
+    .description-section {
+      margin-top: 1rem;
+      width: 100%;
+    }
+
+    .description-container {
+      width: 100%;
+    }
+
+    .description-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .description-textarea {
+      width: 100%;
+      height: 120px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .description-textarea:focus {
+      border-color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Image Quality Check</h1>
+      <p class="subtitle">Upload an image to validate against specifications</p>
+    </header>
+
+    <div class="grid">
+      <div class="left-section">
+        <div class="change-btn-wrapper" id="change-btn-wrapper">
+          <button class="reset-btn" id="reset-btn">Change Image</button>
+        </div>
+
+        <div class="panel" id="left-box">
+          <label for="file-upload" class="upload-area" id="drop-area">
+            <svg class="upload-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <div class="upload-text">
+              <strong>Drag & drop your image</strong>
+              <span>or click to browse files</span>
+            </div>
+            <input id="file-upload" type="file" accept="image/jpeg" />
+            <div class="progress-bar" id="progress-bar">
+              <div class="progress" id="progress"></div>
+            </div>
+          </label>
+        </div>
+
+        <!-- Always visible description section -->
+        <div class="panel description-section">
+          <div class="description-container">
+            <label class="description-label">Image Description:</label>
+            <textarea class="description-textarea" placeholder="Write something about the image..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel result-card">
+        <div class="results-header">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          Quality Check Results
+        </div>
+        <div class="results-body" id="qc-results">
+          <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 1rem;">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            <p>Upload an image to begin validation</p>
+            <p style="font-size: 0.9rem; margin-top: 0.5rem;">Supported format: JPEG</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const dropArea = document.getElementById("drop-area");
+    const fileInput = document.getElementById("file-upload");
+    const leftBox = document.getElementById("left-box");
+    const qcResults = document.getElementById("qc-results");
+    const changeBtnWrapper = document.getElementById("change-btn-wrapper");
+    const resetBtn = document.getElementById("reset-btn");
+    const progressBar = document.getElementById("progress-bar");
+    const progress = document.getElementById("progress");
+
+    setupEventListeners();
+
+    function setupEventListeners() {
+      ['dragover', 'dragenter'].forEach(evt =>
+        dropArea.addEventListener(evt, e => {
+          e.preventDefault();
+          dropArea.classList.add("drag-over");
+        })
+      );
+
+      ['dragleave', 'dragend', 'drop'].forEach(evt =>
+        dropArea.addEventListener(evt, e => {
+          e.preventDefault();
+          dropArea.classList.remove("drag-over");
+        })
+      );
+
+      dropArea.addEventListener("drop", e => {
+        if (e.dataTransfer.files.length) {
+          fileInput.files = e.dataTransfer.files;
+          handleFileUpload(fileInput.files[0]);
+        }
+      });
+
+      fileInput.addEventListener("change", () => {
+        if (fileInput.files.length) {
+          handleFileUpload(fileInput.files[0]);
+        }
+      });
+
+      resetBtn.addEventListener("click", resetUploader);
+    }
+
+    function handleFileUpload(file) {
+      if (!file.type.match("image/jpeg")) {
+        showError("Only JPEG images are supported");
+        return;
+      }
+
+      // Show progress bar
+      progressBar.style.display = "block";
+      
+      // Simulate progress (in a real app, you'd track actual upload progress)
+      let progressValue = 0;
+      const progressInterval = setInterval(() => {
+        progressValue += 5 + Math.random() * 10;
+        if (progressValue >= 100) {
+          progressValue = 100;
+          clearInterval(progressInterval);
+        }
+        progress.style.width = progressValue + "%";
+      }, 100);
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        clearInterval(progressInterval);
+        progress.style.width = "100%";
+        setTimeout(() => {
+          progressBar.style.display = "none";
+          displayImagePreview(file, e.target.result);
+          validateImage(file, e.target.result);
+        }, 300);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function displayImagePreview(file, imageSrc) {
+      changeBtnWrapper.style.display = "block";
+      leftBox.innerHTML = `
+        <div class="preview-image">
+          <img src="${imageSrc}" alt="Uploaded preview" />
+        </div>
+        <div class="panel description-section">
+          <div class="description-container">
+            <label class="description-label">Image Description:</label>
+            <textarea class="description-textarea" placeholder="Write something about the image..."></textarea>
+          </div>
+        </div>
+      `;
+    }
+
+    function validateImage(file, imageSrc) {
+      const img = new Image();
+      img.src = imageSrc;
+      img.onload = () => {
+        const width = img.naturalWidth;
+        const height = img.naturalHeight;
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+        const isJPEG = file.type === "image/jpeg";
+        const resolutionValid = width === 970 && height === 600;
+        const sizeValid = file.size <= 10 * 1024 * 1024;
+        const allPass = isJPEG && resolutionValid && sizeValid;
+        
+        // Calculate quality score (0-100)
+        let score = 0;
+        if (isJPEG) score += 40;
+        if (resolutionValid) score += 40;
+        if (sizeValid) score += 20;
+        
+        // Determine score class
+        let scoreClass = "";
+        if (score === 100) {
+          scoreClass = "pass";
+        } else if (score >= 60) {
+          scoreClass = "warning";
+        } else {
+          scoreClass = "fail";
+        }
+
+        qcResults.innerHTML = `
+          <div class="file-info">
+            <div class="file-name">${file.name}</div>
+            <div class="file-meta">${width} × ${height}px • ${fileSizeMB} MB</div>
+          </div>
+          
+          <div class="score-container">
+            <div class="score-circle ${scoreClass}">${score}</div>
+            <div class="score-details">
+              <div class="score-title">${score === 100 ? 'Perfect!' : score >= 60 ? 'Needs Improvement' : 'Does Not Meet Requirements'}</div>
+              <div class="score-description">${score === 100 ? 'Your image meets all requirements' : 'Some specifications not met'}</div>
+            </div>
+          </div>
+          
+          <div class="result-item">
+            <span>Format <span class="tooltip"><span class="tooltip-icon">ⓘ</span><span class="tooltip-text">Image must be in JPEG format</span></span></span>
+            <span class="result-value ${isJPEG ? 'pass' : 'fail'}">
+              <span class="status-icon ${isJPEG ? 'pass-icon' : 'fail-icon'}">${isJPEG ? '✓' : '✗'}</span>
+              ${isJPEG ? 'JPEG' : 'Invalid format'}
+            </span>
+          </div>
+          
+          <div class="result-item">
+            <span>Dimensions <span class="tooltip"><span class="tooltip-icon">ⓘ</span><span class="tooltip-text">Required: 970 × 600 pixels</span></span></span>
+            <span class="result-value ${resolutionValid ? 'pass' : 'fail'}">
+              <span class="status-icon ${resolutionValid ? 'pass-icon' : 'fail-icon'}">${resolutionValid ? '✓' : '✗'}</span>
+              ${width} × ${height}px
+            </span>
+          </div>
+          
+          <div class="result-item">
+            <span>File Size <span class="tooltip"><span class="tooltip-icon">ⓘ</span><span class="tooltip-text">Maximum size: 10MB</span></span></span>
+            <span class="result-value ${sizeValid ? 'pass' : 'fail'}">
+              <span class="status-icon ${sizeValid ? 'pass-icon' : 'fail-icon'}">${sizeValid ? '✓' : '✗'}</span>
+              ${fileSizeMB} MB
+            </span>
+          </div>
+          
+          <div class="summary ${scoreClass}">
+            <div>${score === 100 ? '✅ All checks passed' : score >= 60 ? '⚠️ Some issues found' : '❌ Does not meet requirements'}</div>
+            ${score < 100 ? '<div class="check-details">Check the requirements below</div>' : ''}
+          </div>
+          
+          <div class="requirements-list">
+            <div class="requirement-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${isJPEG ? 'var(--success)' : 'var(--error)'}" stroke-width="2">
+                ${isJPEG ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>' : '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>'}
+              </svg>
+              <span>JPEG format</span>
+            </div>
+            <div class="requirement-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${resolutionValid ? 'var(--success)' : 'var(--error)'}" stroke-width="2">
+                ${resolutionValid ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>' : '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>'}
+              </svg>
+              <span>970 × 600 pixels</span>
+            </div>
+            <div class="requirement-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${sizeValid ? 'var(--success)' : 'var(--error)'}" stroke-width="2">
+                ${sizeValid ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>' : '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>'}
+              </svg>
+              <span>Max 10MB file size</span>
+            </div>
+          </div>
+        `;
+      };
+    }
+
+    function showError(message) {
+      qcResults.innerHTML = `
+        <div class="summary fail">
+          <div>❌ Error</div>
+          <div class="check-details">${message}</div>
+        </div>
+      `;
+    }
+
+    function resetUploader() {
+      location.reload();
+    }
+  </script>
+</body>
+</html>

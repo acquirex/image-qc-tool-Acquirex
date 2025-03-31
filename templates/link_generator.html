@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bulk Image Link Generator | AcquireX</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+  
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #3a86ff;
+      --primary-dark: #2a4fc7;
+      --primary-gradient: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      --dark: #121212;
+      --darker: #0a0a0a;
+      --light: #f8f9fa;
+      --lighter: #ffffff;
+      --gray: #6c757d;
+      --success: #00c853;
+      --success-light: #5efc82;
+      --success-gradient: linear-gradient(135deg, var(--success), #00a344);
+      --border: rgba(255,255,255,0.1);
+      --border-color: #333;
+      --card-bg: rgba(30, 30, 30, 0.9);
+      --glow: 0 0 15px rgba(67, 97, 238, 0.3);
+      --transition: all 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
+    }
+    .fa-stopwatch {
+  color: var(--primary);
+  margin-right: 5px;
+}
+
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--darker), var(--dark));
+      color: var(--light);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding: 2rem;
+      position: relative;
+      line-height: 1.6;
+    }
+
+    /* Animated background elements */
+    .bg-circle {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.1;
+      z-index: -1;
+      animation: float 15s ease-in-out infinite;
+    }
+
+    .circle-1 {
+      width: 300px;
+      height: 300px;
+      background: var(--primary);
+      top: -100px;
+      left: -100px;
+    }
+
+    .circle-2 {
+      width: 400px;
+      height: 400px;
+      background: var(--success);
+      bottom: -150px;
+      right: -100px;
+      animation-delay: 0.5s;
+      animation-direction: reverse;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(10px, 10px) rotate(2deg); }
+      50% { transform: translate(20px, 5px) rotate(-2deg); }
+      75% { transform: translate(10px, 15px) rotate(1deg); }
+    }
+
+    /* Header styles */
+    .logo-container {
+      position: absolute;
+      top: 20px;
+      left: 40px;
+      z-index: 1000;
+      transition: var(--transition);
+    }
+
+    .logo-container:hover {
+      transform: scale(1.05);
+    }
+
+    .logo-container img {
+      height: 60px;
+      width: auto;
+    }
+
+    .header-line {
+      position: absolute;
+      top: 90px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+      z-index: 999;
+    }
+
+    /* Main container */
+    .main-container {
+      display: flex;
+      width: 100%;
+      max-width: 1200px;
+      margin: 120px auto 0;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    /* Left section (40%) */
+    .left-section {
+      flex: 0 0 40%;
+      max-width: 40%;
+    }
+
+    /* Right section (60%) */
+    .right-section {
+      flex: 0 0 60%;
+      max-width: 60%;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), var(--glow);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Card styles */
+    .card {
+      width: 100%;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 2.5rem;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), var(--glow);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: var(--transition);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 25px rgba(67, 97, 238, 0.4);
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(90deg, var(--primary), var(--success));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      color: var(--gray);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Upload section */
+    .upload-container {
+      margin: 1.5rem 0;
+    }
+
+    .upload-box {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: var(--transition);
+      margin-bottom: 1.5rem;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(67, 97, 238, 0.1), transparent);
+      transition: 0.75s;
+    }
+
+    .upload-box:hover::before {
+      left: 100%;
+    }
+
+    .upload-box:hover {
+      border-color: var(--primary);
+      background: rgba(67, 97, 238, 0.05);
+      box-shadow: 0 0 20px rgba(67, 97, 238, 0.1);
+    }
+
+    .upload-box.active {
+      border-color: var(--primary);
+      background: rgba(67, 97, 238, 0.1);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+      transition: var(--transition);
+    }
+
+    .upload-box:hover .upload-icon {
+      transform: translateY(-5px) scale(1.05);
+    }
+
+    .upload-text h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      color: var(--lighter);
+      font-weight: 600;
+    }
+
+    .upload-text p {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    /* File input and buttons */
+    .file-input {
+      display: none;
+    }
+
+    .file-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--primary-gradient);
+      color: white;
+      padding: 0.9rem 1.8rem;
+      border-radius: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 1rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .file-label::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.75s;
+    }
+
+    .file-label:hover::before {
+      left: 100%;
+    }
+
+    .file-label:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      padding: 1rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(67, 97, 238, 0.5);
+    }
+
+    .submit-btn:disabled {
+      background: var(--gray);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      opacity: 0.7;
+    }
+
+    .file-info {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      display: none;
+      animation: fadeIn 0.4s ease-out;
+      border-left: 4px solid var(--primary);
+      text-align: left;
+    }
+
+    .file-info.show {
+      display: block;
+    }
+
+    .file-info p {
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .file-info strong {
+      color: var(--success-light);
+      font-weight: 500;
+    }
+
+    /* Progress and download section */
+    .progress-download-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-grow: 1;
+    }
+
+    .progress-container {
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 1.5rem;
+    }
+
+    .progress-text {
+      color: var(--gray);
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--success));
+      transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    .download-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--success-gradient);
+      color: var(--darker);
+      padding: 1rem 2rem;
+      font-weight: 600;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: var(--transition);
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
+    }
+
+    .download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 200, 83, 0.4);
+      color: black;
+    }
+
+    /* Loader styles */
+    #loaderOverlay {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      color: var(--light);
+      animation: fadeIn 0.4s ease-out;
+      margin-bottom: 2rem;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(67, 97, 238, 0.2);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Status messages */
+    .status-message {
+      padding: 1rem;
+      border-radius: 8px;
+      display: none;
+      animation: fadeIn 0.4s ease-out;
+      text-align: center;
+    }
+
+    .status-message.error {
+      background: rgba(255, 59, 48, 0.15);
+      color: #ff3b30;
+      border-left: 4px solid #ff3b30;
+    }
+
+    /* Responsive design */
+    @media (max-width: 992px) {
+      .main-container {
+        flex-direction: column;
+        margin-top: 100px;
+      }
+
+      .left-section,
+      .right-section {
+        flex: 1;
+        max-width: 100%;
+        width: 100%;
+      }
+
+      .right-section {
+        margin-top: 2rem;
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1.5rem 1rem;
+      }
+      
+      .logo-container {
+        left: 20px;
+      }
+      
+      .logo-container img {
+        height: 50px;
+      }
+      
+      .header-line {
+        top: 80px;
+      }
+
+      .card {
+        padding: 2rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .upload-box {
+        padding: 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 1.5rem;
+      }
+      
+      .upload-box {
+        padding: 1.25rem;
+      }
+      
+      .file-label, .submit-btn, .download-btn {
+        padding: 0.8rem 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Animated background elements -->
+  <div class="bg-circle circle-1"></div>
+  <div class="bg-circle circle-2"></div>
+
+  <!-- Header -->
+  <div class="logo-container">
+    <img src="/static/Acquirex-logo---Reversed-White.png" alt="Acquirex Logo">
+  </div>
+  <div class="header-line"></div>
+
+  <!-- Main content -->
+  <div class="main-container">
+    <!-- Left section (40%) -->
+    <div class="left-section">
+      <div class="card">
+        <h1>Bulk Image Link Generator</h1>
+        <p class="subtitle">Upload your ZIP file to generate an Excel spreadsheet with image links</p>
+
+        <form id="uploadForm">
+          <div class="upload-container">
+            <div class="upload-box" id="uploadBox">
+              <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+              <div class="upload-text">
+                <h3>Drag & Drop Your Files Here</h3>
+                <p>Supported format: .ZIP</p>
+              </div>
+            </div>
+
+            <input type="file" id="fileInput" class="file-input" accept=".zip" required>
+            <label for="fileInput" class="file-label">
+              <i class="fas fa-folder-open"></i> Select ZIP File
+            </label>
+
+            <div class="file-info" id="fileInfo">
+              <p><i class="fas fa-file-archive"></i> Selected file: <strong id="fileName">No file selected</strong></p>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn" disabled>
+            <i class="fas fa-file-excel"></i> Generate Excel File
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right section (60%) -->
+    <div class="right-section">
+      <div class="progress-download-container">
+        <div id="loaderOverlay">
+          <div class="spinner"></div>
+          <p>Processing your files...</p>
+        </div>
+        
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-bar-fill" id="progressBar"></div>
+          </div>
+        </div>
+        
+        <a id="downloadBtn" href="#" class="download-btn">
+          <i class="fas fa-download"></i> Download Excel File
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const fileName = document.getElementById('fileName');
+    const fileInfo = document.getElementById('fileInfo');
+    const submitBtn = document.getElementById('submitBtn');
+    const uploadBox = document.getElementById('uploadBox');
+    const loaderOverlay = document.getElementById('loaderOverlay');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const uploadForm = document.getElementById('uploadForm');
+    const progressBar = document.getElementById('progressBar');
+
+    // Click to select file
+    uploadBox.addEventListener('click', () => fileInput.click());
+
+    // Drag and drop functionality
+    uploadBox.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadBox.classList.add('active');
+    });
+
+    uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('active'));
+
+    uploadBox.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadBox.classList.remove('active');
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        updateFileInfo();
+      }
+    });
+
+    // File selection handler
+    fileInput.addEventListener('change', updateFileInfo);
+
+    function updateFileInfo() {
+      if (fileInput.files.length > 0) {
+        fileName.textContent = fileInput.files[0].name;
+        fileInfo.classList.add('show');
+        submitBtn.disabled = false;
+      } else {
+        fileInfo.classList.remove('show');
+        submitBtn.disabled = true;
+      }
+    }
+
+    // Form submission with enhanced loading state
+    uploadForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      // Validate file was selected
+      if (!fileInput.files.length) {
+        alert('Please select a ZIP file first');
+        return;
+      }
+
+      // Reset UI state
+      loaderOverlay.style.display = 'flex';
+      submitBtn.disabled = true;
+      progressBar.style.width = '0%';
+      downloadBtn.style.display = 'none';
+
+      const formData = new FormData();
+      formData.append('zip_file', fileInput.files[0]);
+
+      try {
+        // Create progress interval
+        let progressInterval = setInterval(() => {
+          const currentWidth = parseInt(progressBar.style.width) || 0;
+          const newWidth = Math.min(currentWidth + 10, 90);
+          progressBar.style.width = newWidth + '%';
+        }, 500);
+
+        // Make the actual request
+        const res = await fetch('/generate-links', {
+          method: 'POST',
+          body: formData
+        });
+
+        // Clear progress interval
+        clearInterval(progressInterval);
+        
+        // Handle response
+        if (!res.ok) {
+          throw new Error(`Server error: ${res.status}`);
+        }
+
+        const data = await res.json();
+        
+        // Validate response
+        if (!data.excel_url) {
+          throw new Error('Invalid response from server');
+        }
+
+        // Update UI
+        progressBar.style.width = '100%';
+        loaderOverlay.style.display = 'none';
+        downloadBtn.href = data.excel_url;
+        downloadBtn.style.display = 'flex';
+        const processingTime = data.processing_time;
+fileInfo.innerHTML += `
+  <p><i class="fas fa-stopwatch"></i> Processed in: <strong>${processingTime} seconds</strong></p>
+`;
+
+        
+      } catch (err) {
+        console.error('Error:', err);
+        
+        // Reset UI
+        clearInterval(progressInterval);
+        loaderOverlay.innerHTML = `
+          <div class="status-message error">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Error: ${err.message || 'Failed to generate file'}</p>
+          </div>
+        `;
+        submitBtn.disabled = false;
+        progressBar.style.width = '0%';
+      }
+    });
+  </script>
+</body>
+</html>

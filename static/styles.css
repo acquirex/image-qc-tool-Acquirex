@@ -1,0 +1,21 @@
+.upload-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    width: 50%;
+    margin: auto;
+}
+
+.upload-box {
+    text-align: center;
+    padding: 20px;
+    cursor: pointer;
+}
+
+.upload-box img {
+    width: 50px;
+    height: auto;
+}

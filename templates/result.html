@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>✅ Excel Generated - Image Links</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #f0f0f0;
+      padding: 40px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #4cc9f0;
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .message {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      color: #00ff99;
+    }
+
+    .download-btn {
+      background-color: #4361ee;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 30px;
+    }
+
+    .download-btn:hover {
+      background-color: #3a86ff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    th, td {
+      border: 1px solid #333;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #222;
+      color: #00f5d4;
+    }
+
+    img {
+  max-height: 100px;
+  max-width: 200px;
+  object-fit: contain;
+  border-radius: 6px;
+  margin-top: 6px;
+  background-color: #fff;
+  padding: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+
+    .mpn {
+      font-weight: bold;
+      color: #ffb703;
+    }
+
+    .image-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+
+    a {
+      color: #90e0ef;
+      word-break: break-all;
+    }
+
+    @media (max-width: 768px) {
+      td, th {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>✅ Your Excel has been generated!</h1>
+  <p class="message">Below is a preview of the uploaded images and generated links.</p>
+
+  <a class="download-btn" href="{{ url_for('static', filename='exports/' + excel_filename) }}" download>⬇️ Download Excel</a>
+
+
+  <table>
+    <thead>
+      <tr>
+        <th>MPN</th>
+        <th>Images & Links</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in result_data %}
+      <tr>
+        <td class="mpn">{{ item.mpn }}</td>
+        <td>
+            <div class="image-cell">
+              {% for image in item.images %}
+                <div>
+                  <img src="{{ image.url }}" alt="preview">
+                  <a href="{{ image.url }}" target="_blank">{{ image.url }}</a>
+                </div>
+              {% endfor %}
+            </div>
+          </td>
+          
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</body>
+</html>
